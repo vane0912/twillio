@@ -1,14 +1,15 @@
+
 const express = require('express');
+const {handle_message} = require("./functions/conditions")
 const { MessagingResponse } = require('twilio').twiml;
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-app.post("/whatsapp", (req, res) => {
-  console.log("Mensaje recibido:", req.body.Body);
-  res.sendStatus(200);
+app.post("/whatsapp", async (req, res) => {
+  const response = await handle_message(req.body)
+  res.send(response)
 });
 
-app.listen(3000, () => console.log("Webhook activo en puerto 3000"));
+app.listen(3000, () => console.log("Server running"));
