@@ -1,6 +1,5 @@
 require('dotenv').config("../.env")
-const MessagingResponse = require('twilio').twiml.MessagingResponse;
-const {welcome_template} = require("./templates")
+const {send_template} = require("./templates")
 const twilio = require("twilio")
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -9,17 +8,19 @@ const client = twilio(accountSid, authToken);
 
 
 let message_responses = {
-    "Hola" : welcome_template,
-    "Paquete vacacional": ""
+    "Hola, quiero más información sobre el paquete a Colombia" : "HXc7e7fd2369627dd4f872eef0e1584145",
+    "Cotizar": "HX8d8c84160760afa9494d5f00a2ed95f0",
+    "Fallback": "HXda15168c6fcc39e66483806889172289",
+    "Tengo más preguntas": "HXbc12dc3989e61fa666fa604151262c5a"
 }
 
 async function handle_message(message){
-    const response = new MessagingResponse();
     if(message_responses[message.Body]){
-        return await message_responses[message.Body](client)
+        const template_id = message_responses[message.Body];
+        return await send_template(client, template_id)
     }else{
-        const twilio_message = await response.message("En un momento uno de nuestros agentes se contactara contigo.");
-        return twilio_message.toString()
+        const template_id = message_responses.Fallback;
+        return await send_template(client, template_id)
     }
 }
 
